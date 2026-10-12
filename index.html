@@ -1,0 +1,98 @@
+function prevPhoto() {
+      photoIndex = (photoIndex - 1 + samplePhotos.length) % samplePhotos.length;
+      document.getElementById('dispPhoto').src = (photoIndex === 0 && config.photo) ? config.photo : samplePhotos[photoIndex];
+    }
+
+    // Letter Actions
+    function openLetter() {
+      document.getElementById('envelopeView').style.display = 'none';
+      document.getElementById('letterModal').style.display = 'block';
+      confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function replayAll() {
+      poppedCount = 0;
+      document.getElementById('reasonsList').innerHTML = '';
+      document.querySelectorAll('.balloon-node').forEach(b => b.style.visibility = 'visible');
+      document.getElementById('balNextBtn').style.display = 'none';
+      document.getElementById('cakeNextBtn').style.display = 'none';
+      document.getElementById('flameIcon').style.display = 'inline';
+      document.getElementById('candleInstruction').innerText = "मोमबत्ती बुझाने के लिए केक पर टच करें! 🕯️";
+      document.getElementById('envelopeView').style.display = 'block';
+      document.getElementById('letterModal').style.display = 'none';
+      showSlide(1);
+    }
+
+    // URL Params Load
+    function parseURL() {
+      const p = new URLSearchParams(window.location.search);
+      if(p.get('name')) config.name = p.get('name');
+      if(p.get('age')) config.age = p.get('age');
+      if(p.get('sender')) config.sender = p.get('sender');
+      if(p.get('letter')) config.letter = decodeURIComponent(p.get('letter'));
+      if(p.get('photo')) config.photo = decodeURIComponent(p.get('photo'));
+      if(p.get('reasons')) {
+        config.reasons = decodeURIComponent(p.get('reasons')).split('|');
+      }
+      renderDOM();
+    }
+
+    function renderDOM() {
+      document.getElementById('dispTreeName').innerText = `Happy Birthday, ${config.name}`;
+      document.getElementById('dispTreeAge').innerText = `and just like that, you're turning ${config.age} ✨`;
+      document.getElementById('envelopeHeader').innerText = `One last thing, ${config.name}... 💌`;
+      document.getElementById('sealLetter').innerText = config.name.charAt(0).toUpperCase();
+      document.getElementById('letterGreeting').innerText = `Dear ${config.name},`;
+      document.getElementById('letterContent').innerText = config.letter;
+      document.getElementById('dispSenderName').innerText = `— With all my love, ${config.sender}`;
+      document.getElementById('dispFinalName').innerText = config.name;
+      if(config.photo) document.getElementById('dispPhoto').src = config.photo;
+    }
+
+    // Customizer Modal
+    function openCustomizer() {
+      document.getElementById('cfgName').value = config.name;
+      document.getElementById('cfgAge').value = config.age;
+      document.getElementById('cfgSender').value = config.sender;
+      document.getElementById('cfgReasons').value = config.reasons.join(', ');
+      document.getElementById('cfgLetter').value = config.letter;
+      document.getElementById('cfgPhoto').value = config.photo;
+      document.getElementById('customModal').style.display = 'flex';
+    }
+    function closeCustomizer() {
+      document.getElementById('customModal').style.display = 'none';
+    }
+    function applyCustomData() {
+      config.name = document.getElementById('cfgName').value.trim() || "Friend";
+      config.age = document.getElementById('cfgAge').value.trim() || 20;
+      config.sender = document.getElementById('cfgSender').value.trim() || "";
+      const rText = document.getElementById('cfgReasons').value.trim();
+      if(rText) config.reasons = rText.split(',').map(s => s.trim());
+      config.letter = document.getElementById('cfgLetter').value.trim();
+      config.photo = document.getElementById('cfgPhoto').value.trim();
+      renderDOM();
+      closeCustomizer();
+    }
+
+    // Copy Link with parameters
+    function copyShareLink() {
+      const p = new URLSearchParams();
+      p.set('name', config.name);
+      p.set('age', config.age);
+      p.set('sender', config.sender);
+      p.set('letter', encodeURIComponent(config.letter));
+      p.set('photo', encodeURIComponent(config.photo));
+      p.set('reasons', encodeURIComponent(config.reasons.join('|')));
+      
+      const shareUrl = `${window.location.origin}${window.location.pathname}?${p.toString()}`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert("कस्टमाइज़्ड लिंक कॉपी हो गया! इसे आप सीधे WhatsApp या कहीं भी शेयर कर सकते हैं।");
+      }).catch(() => {
+        prompt("इस लिंक को कॉपी करें:", shareUrl);
+      });
+    }
+
+    window.onload = parseURL;
+  </script>
+</body>
+</html>
